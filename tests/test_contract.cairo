@@ -25,7 +25,7 @@ fn test_add_task_as_owner() {
     let contract_address = deploy_contract();
     let todo = ITodoListDispatcher { contract_address };
     start_cheat_caller_address(contract_address, OWNER());
-    let task_id = todo.add_task('Complete your assignment');
+    let task_id = todo.add_task('Complete your task');
     stop_cheat_caller_address(contract_address);
     assert!(task_id == 1, "Expected task ID to be 1");
 }
@@ -38,7 +38,7 @@ fn test_add_task_unauthorized() {
     start_cheat_caller_address(contract_address, KZEE());
     let result = todo.add_task('Unauthorized task');
     stop_cheat_caller_address(contract_address);
-    assert!(result.is_err(), "Non-owner should not be able to add a task");
+    assert!(result.is_err(), "Unauthorized owner should not be able to add a task");
 }
 
 #[test]
@@ -46,7 +46,7 @@ fn test_complete_task_success() {
     let contract_address = deploy_contract();
     let todo = ITodoListDispatcher { contract_address };
     start_cheat_caller_address(contract_address, OWNER());
-    let task_id = todo.add_task('Complete your recent task');
+    let task_id = todo.add_task('Complete your current task');
     todo.complete_task(task_id);
     stop_cheat_caller_address(contract_address);
 }
