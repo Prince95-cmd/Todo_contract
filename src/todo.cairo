@@ -1,15 +1,15 @@
 #[derive(Copy, Drop, starknet::Store, Serde, PartialEq)]
 pub struct Task {
-    id: u64,
+    id: u128,
     title: felt252,
     completed: bool,
 }
 
 #[starknet::interface]
 pub trait ITodoList<TContractState> {
-    fn add_task(ref self: TContractState, title: felt252) -> u64;
-    fn complete_task(ref self: TContractState, task_id: u64);
-    fn delete_task(ref self: TContractState, task_id: u64);
+    fn add_task(ref self: TContractState, title: felt252) -> u128;
+    fn complete_task(ref self: TContractState, task_id: u128);
+    fn delete_task(ref self: TContractState, task_id: u128);
     fn get_all_tasks(self: @TContractState) -> Array<Task>;
 }
 
@@ -26,8 +26,8 @@ use starknet::ContractAddress;
 
     #[storage]
     struct Storage {
-        tasks: Map<u64, Task>,
-        taskCount: u64,
+        tasks: Map<u128, Task>,
+        taskCount: u128,
         owner: ContractAddress,
     }
 
@@ -41,18 +41,18 @@ use starknet::ContractAddress;
 
     #[derive(Drop, starknet::Event)]
     struct TaskAdded {
-        task_id: u64,
+        task_id: u128,
         title: felt252,
     }
 
     #[derive(Drop, starknet::Event)]
     struct TaskCompleted {
-        task_id: u64,
+        task_id: u128,
     }
 
     #[derive(Drop, starknet::Event)]
     struct TaskDeleted {
-        task_id: u64,
+        task_id: u128,
     }
 
     #[constructor]
@@ -64,7 +64,7 @@ use starknet::ContractAddress;
 
     #[abi(embed_v0)]
     impl TodoListImpl of ITodoList<ContractState> {
-        fn add_task(ref self: ContractState, title: felt252) -> u64 {
+        fn add_task(ref self: ContractState, title: felt252) -> u128 {
             let caller = get_caller_address();
             assert(self.owner.read() == caller, 'Only owner can add tasks');
             
@@ -78,7 +78,7 @@ use starknet::ContractAddress;
             task_id
         }
 
-        fn complete_task(ref self: ContractState, task_id: u64) {
+        fn complete_task(ref self: ContractState, task_id: u128) {
          
             let caller = get_caller_address();
             let owner = self.owner.read();
@@ -95,7 +95,7 @@ use starknet::ContractAddress;
         }
         
 
-        fn delete_task(ref self: ContractState, task_id: u64) {
+        fn delete_task(ref self: ContractState, task_id: u128) {
             let caller = get_caller_address();
             assert(self.owner.read() == caller, 'Unauthorized');
             let task = self.tasks.read(task_id);
@@ -114,7 +114,7 @@ use starknet::ContractAddress;
             let mut all_tasks = ArrayTrait::new();
             let tasks_count = self.taskCount.read();
             
-            let mut i: u64 = 1;
+            let mut i: u128 = 1;
             while i <= tasks_count {
                 let task = self.tasks.read(i);
                 if task.id != 0 { 
