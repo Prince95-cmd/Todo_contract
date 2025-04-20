@@ -27,7 +27,7 @@ use starknet::ContractAddress;
     #[storage]
     struct Storage {
         tasks: Map<u128, Task>,
-        taskCount: u128,
+        taskCounter: u128,
         owner: ContractAddress,
     }
 
@@ -58,7 +58,7 @@ use starknet::ContractAddress;
     #[constructor]
     fn constructor(ref self: ContractState, owner_address: ContractAddress) {
         self.owner.write(owner_address);
-        self.taskCount.write(0); 
+        self.taskCounter.write(0); 
     }
 
 
@@ -68,12 +68,12 @@ use starknet::ContractAddress;
             let caller = get_caller_address();
             assert(self.owner.read() == caller, 'Only owner can add tasks');
             
-            let task_id = self.taskCount.read() + 1;
+            let task_id = self.taskCounter.read() + 1;
             assert(title != 0, 'Task title cannot be empty');
             let newTask = Task { id: task_id, title, completed: false };
 
             self.tasks.write(task_id, newTask);
-            self.taskCount.write(task_id);
+            self.taskCounter.write(task_id);
             self.emit(TaskAdded { task_id, title });
             task_id
         }
@@ -112,7 +112,7 @@ use starknet::ContractAddress;
 
         fn get_all_tasks(self: @ContractState) -> Array<Task> {
             let mut all_tasks = ArrayTrait::new();
-            let tasks_count = self.taskCount.read();
+            let tasks_count = self.taskCounter.read();
             
             let mut i: u128 = 1;
             while i <= tasks_count {

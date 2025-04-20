@@ -1,4 +1,4 @@
-use todo::todo::{TodoList, ITodoListDispatcher, ITodoListSafeDispatcher, ITodoListSafeDispatcherTrait, ITodoListDispatcherTrait};
+use todo_contract::todo::{ITodoListDispatcher, ITodoListSafeDispatcher, ITodoListSafeDispatcherTrait, ITodoListDispatcherTrait};
 use snforge_std::{
     ContractClassTrait, DeclareResultTrait, declare,
     start_cheat_caller_address, stop_cheat_caller_address,
@@ -8,8 +8,8 @@ use starknet::ContractAddress;
 pub fn OWNER() -> ContractAddress {
     'OWNER'.try_into().unwrap()
 }
-pub fn OSCAR() -> ContractAddress {
-    'OSCAR'.try_into().unwrap()
+pub fn KZEE() -> ContractAddress {
+    'KZEE'.try_into().unwrap()
 }
 
 fn deploy_contract() -> ContractAddress {
@@ -35,7 +35,7 @@ fn test_add_task_as_owner() {
 fn test_add_task_unauthorized() {
     let contract_address = deploy_contract();
     let todo = ITodoListSafeDispatcher { contract_address };
-    start_cheat_caller_address(contract_address, OSCAR());
+    start_cheat_caller_address(contract_address, KZEE());
     let result = todo.add_task('Unauthorized task');
     stop_cheat_caller_address(contract_address);
     assert!(result.is_err(), "Non-owner should not be able to add a task");
@@ -72,7 +72,7 @@ fn test_delete_task_unauthorized() {
     let task_id = task_id_result.unwrap();
     stop_cheat_caller_address(contract_address);
 
-    start_cheat_caller_address(contract_address, OSCAR());
+    start_cheat_caller_address(contract_address, KZEE());
     let result = todo.delete_task(task_id);
     stop_cheat_caller_address(contract_address);
     assert!(result.is_err(), "Unauthorized user should not delete task");
